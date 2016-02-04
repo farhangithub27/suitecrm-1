@@ -87,13 +87,15 @@ If the above fails, please use easy_install instead:
 Session Object
 --------------
 
-class sugarcrm.Session(url, username, password, app="Python", lang="en_us")
+class sugarcrm.Session(url, username, password, app="Python", lang="en_us", verify=True)
     The main class used to connect to the SugarCRM API and make requests with.
 
 .. code-block:: python
 
     url = "http://your-sugarcrm-domain/service/v4/rest.php"
     session = sugarcrm.Session(url, username, password)
+
+The **verify** parameter is passed directly to the python-requests library that is used to make HTTP POST requests to the SugarCRM API. Read more about this parameter from the python-requests documentation: http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
 
 
 Available Methods
