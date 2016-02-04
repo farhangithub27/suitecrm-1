@@ -5,7 +5,7 @@
 #  Author:  ryanss <ryanssdev@icloud.com>
 #  Website: https://github.com/ryanss/sugarcrm
 #  License: MIT (see LICENSE file)
-#  Version: 0.1.1 (October 4, 2015)
+#  Version: 0.1.2 (February 4, 2016)
 
 
 try:
@@ -16,7 +16,7 @@ except ImportError:
 
 setup(
     name='sugarcrm',
-    version='0.1.1',
+    version='0.1.2',
     author='ryanss',
     author_email='ryanssdev@icloud.com',
     url='https://github.com/ryanss/sugarcrm',
