@@ -19,6 +19,16 @@ import sys
 import requests
 
 
+def valid_session(func):
+    def decorator(*args, **kwargs):
+        if len(args[0].session_id) > 0:
+            func(*args, **kwargs)
+        else:
+            raise SugarError("Session not valid")
+
+    return decorator
+
+
 class Session:
 
     def __init__(self, url, username, password, app="Python", lang="en_us",
@@ -44,6 +54,7 @@ class Session:
         raise SugarError("SugarCRM API _request returned status code %d (%s)"
                          % (r.status_code, r.reason))
 
+    @valid_session
     def get_available_modules(self, filter="default"):
         """Retrieves a list of available modules in the system."""
         data = [self.session_id, filter]
@@ -59,6 +70,7 @@ class Session:
     def get_document_revision(self):
         raise SugarError("Method not implemented yet.")
 
+    @valid_session
     def get_entry(self, module, id, links=dict(), track_view=False):
         """Retrieves a single object based on object ID."""
         relationships = []
@@ -83,6 +95,7 @@ class Session:
                     getattr(obj, m['name']).append(robj)
         return obj
 
+    @valid_session
     def get_entries(self, module, ids, track_view=False):
         """Retrieves a list of objects based on specified object IDs."""
         if not isinstance(ids, list):
@@ -100,11 +113,13 @@ class Session:
             ret.append(obj)
         return ret
 
+    @valid_session
     def get_entries_count(self, q, deleted=False):
         """Retrieves a count of beans based on query specifications."""
         data = [self.session_id, q.module, q.query, int(deleted)]
         return int(self._request('get_entries_count', data)['result_count'])
 
+    @valid_session
     def get_entry_list(self, q, fields=(), links=dict(), order_by="",
                        max_results=0, offset=0,
                        deleted=False, favorites=False):
@@ -202,7 +217,14 @@ class Session:
         return self._request('login', data)
 
     def logout(self):
-        raise SugarError("Method not implemented yet.")
+        if len(self.session_id) > 0:
+            data = [
+                self.session_id
+            ]
+            self._request('logout', data)
+            self.session_id = ''
+
+        # Otherwise we don't have a valid session
 
     def oauth_access(self):
         raise SugarError("Method not implemented yet.")
@@ -216,6 +238,7 @@ class Session:
     def set_campaign_merge(self):
         raise SugarError("Method not implemented yet.")
 
+    @valid_session
     def set_document_revision(self, doc, f, revision=None):
         """Creates a new document revision for a specific document record."""
         if isinstance(f, str) or isinstance(f, unicode):
@@ -232,6 +255,7 @@ class Session:
     def set_entries(self):
         raise SugarError("Method not implemented yet.")
 
+    @valid_session
     def set_entry(self, obj):
         """Creates or updates a specific object."""
         data = [self.session_id, obj.module, obj.fields]
@@ -239,6 +263,7 @@ class Session:
         obj.id = result['id']
         return obj
 
+    @valid_session
     def set_note_attachment(self, note, f):
         """Creates an attachmentand associates it to a specific note object."""
         if isinstance(f, str) or isinstance(f, unicode):
@@ -251,6 +276,7 @@ class Session:
         data = [self.session_id, fields]
         return self._request('set_note_attachment', data)
 
+    @valid_session
     def set_relationship(self, parent, child, delete=False):
         """Sets relationships between two records."""
         delete = int(delete)
@@ -271,7 +297,6 @@ class Session:
 
     def snip_update_contacts(self):
         raise SugarError("Method not implemented yet.")
-
 
 class SugarObject:
 
@@ -313,6 +338,10 @@ class SugarObject:
         return q
 
 
+class Account(SugarObject):
+    module = "Accounts"
+
+
 class Call(SugarObject):
     module = "Calls"
 
@@ -349,24 +378,12 @@ class Opportunity(SugarObject):
     module = "Opportunities"
 
 
-class Product(SugarObject):
-    module = "Products"
-
-
 class Prospect(SugarObject):
     module = "Prospects"
 
 
 class ProspectList(SugarObject):
     module = "ProspectLists"
-
-
-class Quote(SugarObject):
-    module = "Quotes"
-
-
-class Report(SugarObject):
-    module = "Reports"
 
 
 class User(SugarObject):
