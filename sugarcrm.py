@@ -22,7 +22,7 @@ import requests
 def valid_session(func):
     def decorator(*args, **kwargs):
         if len(args[0].session_id) > 0:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         else:
             raise SugarError("Session not valid")
 
@@ -127,24 +127,32 @@ class Session:
         relationships = []
         for key, value in links.items():
             relationships.append({'name': key.lower(), 'value': value})
+
         data = [self.session_id, q.module, q.query, order_by, offset, fields,
                 relationships, max_results, int(deleted), int(favorites)]
+
         results = self._request('get_entry_list', data)
-        entry_list = results['entry_list']
+
         ret = []
-        for i, result in enumerate(entry_list):
-            obj = SugarObject(module=q.module, __class__=q.__class__)
-            for key in result['name_value_list']:
-                setattr(obj, key, result['name_value_list'][key]['value'])
-            if results['relationship_list']:
-                for m in results['relationship_list'][i]['link_list']:
-                    setattr(obj, m['name'], [])
-                    for record in m['records']:
-                        robj = SugarObject(module=m['name'])
-                        for k in record['link_value']:
-                            setattr(robj, k, record['link_value'][k]['value'])
-                        getattr(obj, m['name']).append(robj)
-            ret.append(obj)
+
+        if 'entry_list' in results:
+            entry_list = results['entry_list']
+
+            for i, result in enumerate(entry_list):
+                obj = SugarObject(module=q.module, __class__=q.__class__)
+
+                for key in result['name_value_list']:
+                    setattr(obj, key, result['name_value_list'][key]['value'])
+                if results['relationship_list']:
+                    for m in results['relationship_list'][i]['link_list']:
+                        setattr(obj, m['name'], [])
+                        for record in m['records']:
+                            robj = SugarObject(module=m['name'])
+                            for k in record['link_value']:
+                                setattr(robj, k, record['link_value'][k]['value'])
+                            getattr(obj, m['name']).append(robj)
+                ret.append(obj)
+
         return ret
 
     def get_language_definition(self):
@@ -156,8 +164,10 @@ class Session:
     def get_modified_relationships(self):
         raise SugarError("Method not implemented yet.")
 
-    def get_module_fields(self):
-        raise SugarError("Method not implemented yet.")
+    @valid_session
+    def get_module_fields(self, module_name, fields=[]):
+        data = [self.session_id, module_name, fields]
+        return self._request('get_module_fields', data)
 
     def get_module_fields_md5(self):
         raise SugarError("Method not implemented yet.")
@@ -181,13 +191,19 @@ class Session:
         raise SugarError("Method not implemented yet.")
 
     def get_server_info(self):
-        raise SugarError("Method not implemented yet.")
+        result = self._request('get_server_info', None)
+        return {
+            'version':  result['version'],
+            'flavor':   result['flavor'],
+            'gmt_time': result['gmt_time']
+        }
 
     def get_upcoming_activities(self):
         raise SugarError("Method not implemented yet.")
 
+    @valid_session
     def get_user_id(self):
-        raise SugarError("Method not implemented yet.")
+        return self._request('get_user_id', self.session_id)
 
     def get_user_team_id(self):
         raise SugarError("Method not implemented yet.")
@@ -298,6 +314,7 @@ class Session:
     def snip_update_contacts(self):
         raise SugarError("Method not implemented yet.")
 
+
 class SugarObject:
 
     def __init__(self, **kwargs):
@@ -330,11 +347,17 @@ class SugarObject:
                 continue
             if q:
                 q += "AND "
-            if value.find('%') >= 0:
-                q += "%s.%s LIKE '%s' " \
-                     % (self.module.lower(), key, str(value))
-            else:
-                q += "%s.%s='%s' " % (self.module.lower(), key, str(value))
+
+            if isinstance(value, str):
+                if value.find('%') >= 0:
+                    q += "%s LIKE '%s' " \
+                         % (key, str(value))
+                else:
+                    q += "%s='%s' " % (key, str(value))
+
+            elif isinstance(value, int):
+                q += "%s=%s " % (key, value)
+
         return q
 
 
