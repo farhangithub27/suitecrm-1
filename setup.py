@@ -1,9 +1,9 @@
-#  SugarCRM
+#  SuiteCRM
 #  --------
-#  Python client for SugarCRM API.
+#  Python client for SuiteCRM API.
 #
-#  Author:  ryanss <ryanssdev@icloud.com>
-#  Website: https://github.com/ryanss/sugarcrm
+#  Author:  dominic <dominicchinkh@gmail.com>
+#  Website: https://github.com/dominicchinkh/suitecrm
 #  License: MIT (see LICENSE file)
 #  Version: 0.1.2 (February 4, 2016)
 
@@ -15,14 +15,14 @@ except ImportError:
 
 
 setup(
-    name='sugarcrm',
+    name='suitecrm',
     version='0.1.2',
-    author='ryanss',
-    author_email='ryanssdev@icloud.com',
-    url='https://github.com/ryanss/sugarcrm',
+    author='dominic',
+    author_email='dominicchinkh@gmail.com',
+    url='https://github.com/dominicchinkh/suitecrm',
     license='MIT',
-    py_modules=['sugarcrm'],
-    description='Python client for SugarCRM API',
+    py_modules=['suitecrm'],
+    description='Python client for SuiteCRM API',
     long_description=open('README.rst').read(),
     install_requires=['requests'],
     platforms='any',

@@ -1,9 +1,9 @@
-#  SugarCRM
+#  SuiteCRM
 #  --------
-#  Python client for SugarCRM API.
+#  Python client for SuiteCRM API.
 #
-#  Author:  ryanss <ryanssdev@icloud.com>
-#  Website: https://github.com/ryanss/sugarcrm
+#  Author:  dominic <dominicchinkh@gmail.com>
+#  Website: https://github.com/dominicchinkh/suitecrm
 #  License: MIT (see LICENSE file)
 #  Version: 0.1.2 (February 4, 2016)
 
@@ -323,7 +323,7 @@ class SugarObject:
             if key == "module":
                 try:
                     cls = value[:-1].replace('ie', 'y').title()
-                    self.__class__ = getattr(sys.modules['sugarcrm'], cls)
+                    self.__class__ = getattr(sys.modules['suitecrm'], cls)
                 except:
                     pass
 

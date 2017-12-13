@@ -1,17 +1,17 @@
 ========
-SugarCRM
+SuiteCRM
 ========
 
-Python client for SugarCRM API.
+Python client for SuiteCRM API.
 
-.. image:: http://img.shields.io/pypi/v/sugarcrm.svg
-    :target: https://pypi.python.org/pypi/sugarcrm
+.. image:: http://img.shields.io/pypi/v/suitecrm.svg
+    :target: https://pypi.python.org/pypi/suitecrm
 
-.. image:: http://img.shields.io/pypi/dm/sugarcrm.svg
-    :target: https://pypi.python.org/pypi/sugarcrm
+.. image:: http://img.shields.io/pypi/dm/suitecrm.svg
+    :target: https://pypi.python.org/pypi/suitecrm
 
-.. image:: http://img.shields.io/pypi/l/sugarcrm.svg
-    :target: https://github.com/ryanss/sugarcrm/blob/master/LICENSE
+.. image:: http://img.shields.io/pypi/l/suitecrm.svg
+    :target: https://github.com/dominicchinkh/suitecrm/blob/master/LICENSE
 
 
 Example Usage
@@ -19,27 +19,27 @@ Example Usage
 
 .. code-block:: python
 
-    import sugarcrm
+    import suitecrm
 
     # Connect
-    url = "http://your-sugarcrm-domain/service/v4/rest.php"
-    session = sugarcrm.Session(url, username, password)
+    url = "http://your-suitecrm-domain/service/v4_1/rest.php"
+    session = suitecrm.Session(url, username, password)
 
     # Create a new note
-    note = sugarcrm.Note(name="Test Note")
+    note = suitecrm.Note(name="Test Note")
 
     # Save note
     session.set_entry(note)
 
     # Add attachment to note
-    session.set_note_attachment(note, "sugarcrm.py")
+    session.set_note_attachment(note, "suitecrm.py")
 
     # Query for all notes that have a name that begins with "Test"
-    note_query = sugarcrm.Note(name="Test%")
+    note_query = suitecrm.Note(name="Test%")
     results = session.get_entry_list(note_query)
 
     # Query for all contacts with the first name "Mylee"
-    contact_query = sugarcrm.Contact(first_name="Mylee")
+    contact_query = suitecrm.Contact(first_name="Mylee")
     results = session.get_entry_list(contact_query)
 
     # Get the email address for the user assigned to an Opportunity
@@ -48,13 +48,13 @@ Example Usage
     print user.email1
 
     # Change the status of an Opportunity
-    op = sugarcrm.Opportunity(id="82f72939-735e-53a2-0944-5418c4edae2a")
+    op = suitecrm.Opportunity(id="82f72939-735e-53a2-0944-5418c4edae2a")
     op.sales_stage = "Approved"
     session.set_entry(op)
 
     # Extract all non-empty email fields from all Contacts in SugarCRM
     emails = set()
-    contact_query = sugarcrm.Contact()  # No filters provider finds all objects
+    contact_query = suitecrm.Contact()  # No filters provider finds all objects
     contact_count = session.get_entries_count(contact_query, deleted=True)
     print "Extracting emails from %d Contacts" % contact_count
     # Grab 100 Contact objects at a time from SugarCRM
@@ -75,25 +75,25 @@ The latest stable version can always be installed or updated via pip:
 
 .. code-block:: bash
 
-    $ pip install sugarcrm
+    $ pip install suitecrm
 
 If the above fails, please use easy_install instead:
 
 .. code-block:: bash
 
-    $ easy_install sugarcrm
+    $ easy_install suitecrm
 
 
 Session Object
 --------------
 
-class sugarcrm.Session(url, username, password, app="Python", lang="en_us", verify=True)
+class suitecrm.Session(url, username, password, app="Python", lang="en_us", verify=True)
     The main class used to connect to the SugarCRM API and make requests with.
 
 .. code-block:: python
 
-    url = "http://your-sugarcrm-domain/service/v4/rest.php"
-    session = sugarcrm.Session(url, username, password)
+    url = "http://your-suitecrm-domain/service/v4_1/rest.php"
+    session = suitecrm.Session(url, username, password)
 
 The **verify** parameter is passed directly to the python-requests library that is used to make HTTP POST requests to the SugarCRM API. Read more about this parameter from the python-requests documentation: http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
 
@@ -147,7 +147,7 @@ get_entries_count(query_object, deleted=False)
 
     # Get a count of all Contacts with a first name of "Fred"
     # and include Contacts that have been deleted
-    contact_query = sugarcrm.Contact(first_name="Fred")
+    contact_query = suitecrm.Contact(first_name="Fred")
     contacts = session.get_entries_count(contact_query, deleted=True)
     for contact in contacts:
         print contact.first_name, contact.last_name
@@ -158,14 +158,14 @@ get_entry_list(query_object, fields=[], links={}, order_by="", max_results=0, of
 .. code-block:: python
 
     # Get a list of all Notes with a name that begins with "Test"
-    note_query = sugarcrm.Note(name="Test%")
+    note_query = suitecrm.Note(name="Test%")
     notes = session.get_entry_list(note_query)
     for note in notes:
         print note.name
 
     # Get a list of all Opportunities created since Sept 1, 2014 and include
     # data about link contacts with each Opportunitity returned
-    q = sugarcrm.Opportunity()
+    q = suitecrm.Opportunity()
     q.query = "opportunities.date_entered > '2014-09-01'"
     links = {'Contacts': ['id', 'first_name', 'last_name']}
     results = session.get_entry_list(q, links=links)
@@ -181,7 +181,7 @@ set_document_revision(document, file)
 
 .. code-block:: python
 
-    doc = sugarcrm.Document(document_name="Test Doc", revision=1)
+    doc = suitecrm.Document(document_name="Test Doc", revision=1)
     session.set_entry(doc)
     session.set_document_revision(doc, "/path/to/test.pdf")
 
@@ -191,7 +191,7 @@ set_entry(sugar_object)
 
 .. code-block:: python
 
-    note = sugarcrm.Note()
+    note = suitecrm.Note()
     note.name = "Test Note"
     note.assigned_user_id = "82f72939-735e-53a2-0944-5418c4edae2a"
     session.set_entry(note)
@@ -212,7 +212,7 @@ set_relationship(parent, child, delete=False)
 
 .. code-block:: python
 
-    doc = sugarcrm.Document(document_name="Test Doc", revision=1)
+    doc = suitecrm.Document(document_name="Test Doc", revision=1)
     session.set_entry(doc)
     session.set_document_revision(doc, "/path/to/test.pdf")
     opportunity = session.get_entry("Opportunities", "5b671886-cfe4-36f5-fa9d-5418a24e4aca")
@@ -222,7 +222,7 @@ set_relationship(parent, child, delete=False)
 Unavailable Methods
 -------------------
 
-.. _issue: https://github.com/ryanss/sugarcrm/issues
+.. _issue: https://github.com/dominicchinkh/suitecrm/issues
 
 The following lesser-used SugarCRM API methods have not been included in this
 library yet. Please open an issue_ if you require any of these methods and I
@@ -238,9 +238,6 @@ get_last_viewed()
     Method not implemented yet.
 
 get_modified_relationships()
-    Method not implemented yet.
-
-get_module_fields()
     Method not implemented yet.
 
 get_module_fields_md5()
@@ -264,13 +261,7 @@ get_report_entries()
 get_report_pdf()
     Method not implemented yet.
 
-get_server_info()
-    Method not implemented yet.
-
 get_upcoming_activities()
-    Method not implemented yet.
-
-get_user_id()
     Method not implemented yet.
 
 get_user_team_id()
@@ -318,63 +309,63 @@ SugarCRM Objects
 
 .. code-block:: python
 
-    >>> call = sugarcrm.Call()
+    >>> call = suitecrm.Call()
     >>> print call.module
     "Calls"
 
-    >>> campaign = sugarcrm.Campaign()
+    >>> campaign = suitecrm.Campaign()
     >>> print campaign.module
     "Campaigns"
 
-    >>> contact = sugarcrm.Contact()
+    >>> contact = suitecrm.Contact()
     >>> print contact.module
     "Contacts"
 
-    >>> document = sugarcrm.Document()
+    >>> document = suitecrm.Document()
     >>> print document.module
     "Documents"
 
-    >>> email = sugarcrm.Email()
+    >>> email = suitecrm.Email()
     >>> print email.module
     "Emails"
 
-    >>> lead = sugarcrm.Lead()
+    >>> lead = suitecrm.Lead()
     >>> print lead.module
     "Leads"
 
-    >>> module = sugarcrm.Module()
+    >>> module = suitecrm.Module()
     >>> print module.module
     "Modules"
 
-    >>> note = sugarcrm.Note()
+    >>> note = suitecrm.Note()
     >>> print note.module
     "Notes"
 
-    >>> opportunity = sugarcrm.Opportunity()
+    >>> opportunity = suitecrm.Opportunity()
     >>> print opportunity.module
     "Opportunities"
 
-    >>> product = sugarcrm.Product()
+    >>> product = suitecrm.Product()
     >>> print product.module
     "Products"
 
-    >>> prospect = sugarcrm.Prospect()
+    >>> prospect = suitecrm.Prospect()
     >>> print prospect.module
     "Prospects"
 
-    >>> prospect_list = sugarcrm.ProspectList()
+    >>> prospect_list = suitecrm.ProspectList()
     >>> print prospect_list.module
     "ProspectLists"
 
-    >>> quote = sugarcrm.Quote()
+    >>> quote = suitecrm.Quote()
     >>> print quote.module
     "Quotes"
 
-    >>> report = sugarcrm.Report()
+    >>> report = suitecrm.Report()
     >>> print report.module
     "Reports"
 
-    >>> user = sugarcrm.User()
+    >>> user = suitecrm.User()
     >>> print user.module
     "Users"
 
@@ -386,14 +377,14 @@ The latest development version can be installed directly from GitHub:
 
 .. code-block:: bash
 
-    $ pip install --upgrade https://github.com/ryanss/sugarcrm/tarball/master
+    $ pip install --upgrade https://github.com/dominicchinkh/suitecrm/tarball/master
 
 
 Contributions
 -------------
 
-.. _issues: https://github.com/ryanss/sugarcrm/issues
-.. __: https://github.com/ryanss/sugarcrm/pulls
+.. _issues: https://github.com/dominicchinkh/suitecrm/issues
+.. __: https://github.com/dominicchinkh/suitecrm/pulls
 
 Issues_ and `Pull Requests`__ are always welcome.
 
@@ -401,7 +392,12 @@ Issues_ and `Pull Requests`__ are always welcome.
 License
 -------
 
-.. __: https://github.com/ryanss/sugarcrm/raw/master/LICENSE
+.. __: https://github.com/dominicchinkh/suitecrm/raw/master/LICENSE
 
 Code and documentation are available according to the MIT License
 (see LICENSE__).
+
+The following code is a derivative work of the code from ryanss's sugarcrm project, 
+which is licensed MIT. This code therefore is also licensed under the terms 
+of the MIT License.
+
