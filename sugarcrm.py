@@ -181,8 +181,9 @@ class Session:
     def get_quotes_pdf(self):
         raise SugarError("Method not implemented yet.")
 
-    def get_relationships(self):
-        raise SugarError("Method not implemented yet.")
+    def get_relationships(self, module_name, module_id, link_field_name, related_fields):
+        data = [self.session_id, module_name, module_id, link_field_name, None, related_fields]
+        return self._request('get_relationships', data)
 
     def get_report_entries(self):
         raise SugarError("Method not implemented yet.")
@@ -293,16 +294,13 @@ class Session:
         return self._request('set_note_attachment', data)
 
     @valid_session
-    def set_relationship(self, parent, child, delete=False):
+    def set_relationship(self, parent, child, name_value_list=[], delete=False):
         """Sets relationships between two records."""
         delete = int(delete)
         related_ids = [child.id, ]
-        name_value_list = [{
-            'name': "%s_%s" % (parent.module.lower(), child.module.lower()),
-            'value': 'Other',
-        }]
         data = [self.session_id, parent.module, parent.id,
                 child.module.lower(), related_ids, name_value_list, delete]
+
         return self._request('set_relationship', data)
 
     def set_relationships(self):
@@ -357,6 +355,9 @@ class SugarObject:
 
             elif isinstance(value, int):
                 q += "%s=%s " % (key, value)
+
+            elif isinstance(value, dict):
+                q += "%s%s%s " % (key, value['operator'], value['operand'])
 
         return q
 
